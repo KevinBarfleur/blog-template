@@ -57,6 +57,7 @@ class App extends Component {
     this.deleteArticle = this.deleteArticle.bind(this)
     this.scrollToArticle = this.scrollToArticle.bind(this)
     this.autoClosePanel = this.autoClosePanel.bind(this)
+    this.changeViewFromSearch = this.changeViewFromSearch.bind(this)
   }
 
   componentWillMount () {
@@ -187,7 +188,8 @@ class App extends Component {
       if (inputId === snapshot.val().id && inputPassword === snapshot.val().password) {
         this.setState({
           login: true,
-          loginScreen: false
+          loginScreen: false,
+          username: snapshot.val().id
         })
       } else {
         this.setState({
@@ -217,6 +219,19 @@ class App extends Component {
         selected: undefined
       }})
     }
+  }
+
+  changeViewFromSearch = index => {
+    this.setState({
+      search: false,
+      view: {
+        type: 'article',
+        selected: index
+      }
+    }, () => {
+      const searchInput = document.querySelector('.searchInput')
+      searchInput.value = ''
+    })
   }
 
   displayLoginScreen = () => {
@@ -251,10 +266,19 @@ class App extends Component {
     })
   }
 
+  setDate = date => {
+    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+    const d = [days[date.getDay() - 1], date.getDate(), months[date.getMonth()], date.getFullYear()]
+    
+    return d
+  }
+
   addArticle = (event, name, image, preview) => {
     event.preventDefault()
     const articleRef = firebase.database().ref('articles')
     const date = new Date()
+    // this.setDate(date)
 
     articleRef.push({
         article: name,
@@ -262,8 +286,10 @@ class App extends Component {
         htmlContent: '',
         preview: preview,
         sortDate: date.getTime(),
-        visible: false
+        visible: false,
+        date: this.setDate(date)
     })
+
     this.quitCreateArticlePanel()
   }
 
@@ -298,6 +324,7 @@ class App extends Component {
   }
    
   render () {
+    const home = this.state.view.type !== 'grid' ? <Home /> : <Home />
     const lastArticlesTitle = this.state.articles ? <ExplorerTitle>Derniers Articles</ExplorerTitle> : null
     const loginButton = this.state.login ? null : <LoginButton displayLoginScreen={ this.displayLoginScreen } />
     const loginScreen = this.state.loginScreen ? <LoginScreen displayLoginScreen={ this.displayLoginScreen } login={ this.login }/> : null
@@ -314,11 +341,16 @@ class App extends Component {
                                                                                                updateImage={ this.updateImage }
                                                                                                updatePresentation={ this.updatePresentation } /> : null
                                  
-    const explorer = this.state.articles ? Object.keys(this.state.articles).map(key =>
-      <ExplorerElement key={ key }
+    const explorer = this.state.articles ? Object.keys(this.state.articles).map((key, index) => {
+        if (true) {
+          return (
+            <ExplorerElement key={ key }
                        login={ this.state.login }
                        details={ this.state.articles[key] }
                        scrollToArticle={ this.scrollToArticle } />
+          )
+        }
+      }
     ) : null
 
     const articles = this.state.articles ? Object.keys(this.state.articles).map(key => 
@@ -349,7 +381,7 @@ class App extends Component {
                     index={ key }
                     details={ this.state.articles[key] }
                     currentSearch={ this.state.currentSearch } 
-                    searchView= { this.searchView } />) : null
+                    changeViewFromSearch= { this.changeViewFromSearch } />) : null
 
     let view = this.state.view.type === 'grid' ? <ContainerGrid className="articlesGrid">{ articles }</ContainerGrid> : article
     view = this.state.search === true ?  <SearchContainer>{ searchedArticles }</SearchContainer> : view
@@ -367,8 +399,8 @@ class App extends Component {
             { explorer }
             { lastArticlesTitle }
             </ExplorerPanel>
-            <Home />         
-                { view }
+            { home }         
+            { view }
           </ContainerApp>
         </div>
       )

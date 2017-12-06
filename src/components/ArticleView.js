@@ -38,6 +38,10 @@ class ArticleView extends Component {
   // }
 
   render () {
+    const d = this.props.content.date
+    const date = `${d[0]} ${d[1]} ${d[2]} ${d[3]}`
+
+
     if (this.props.login) {
       return(
           <Container className="articleView">
@@ -58,6 +62,7 @@ class ArticleView extends Component {
       return (
         <Container className="articleView">
           <Button onClick={ this.props.changeView }><i className="fa fa-angle-left"></i> Retour</Button>
+          <EditDate>Écrit par { this.props.content.username } le { date }</EditDate>
           <Title> { this.props.content.article } </Title>
           {/* <div dangerouslySetInnerHTML={{ __html: this.state.content.htmlContent }}></div> */}
           <ReadTextEditor content={ this.props.content }/>
@@ -66,6 +71,11 @@ class ArticleView extends Component {
     }
   }
 }
+
+const EditDate = styled.p`
+  text-align: center;
+  font-style: italic;
+`
 
 const Title = styled.h3`
   color: #212121;

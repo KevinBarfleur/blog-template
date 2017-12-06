@@ -2,7 +2,9 @@
 import React, { Component } from 'react'
 
 // Styled components
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
+
+import { fadeIn } from 'react-animations'
 
 class SearchResult extends Component {
   constructor () {
@@ -12,13 +14,14 @@ class SearchResult extends Component {
   } 
 
   render () {
-    //const index = this.props.index
+    const index = this.props.index
     const currentSearch = this.props.currentSearch
+    
 
     if(this.props.details.keywords) {
         if(this.props.details.keywords.includes(currentSearch)) {
             return (
-                <Container className="searchResult" onClick={() => {/*this.props.changeView(index)*/} }>
+                <Container className="searchResult" onClick={() => this.props.changeViewFromSearch(index) }>
                     <h3>{ this.props.details.article }</h3>
                     <img src={ this.props.details.img } alt='image article' width='60%'/>
                 </Container>
@@ -56,6 +59,8 @@ class SearchResult extends Component {
 // }
 
 
+const fadeInAnimation = keyframes`${fadeIn}`
+
 const Container = styled.div`
     font-size: 1.2em;
     color: black;
@@ -77,6 +82,8 @@ const Container = styled.div`
         box-shadow: 10px 10px 50px lightgrey;
         transition: .4s;
     }
+
+    animation: .5s ${fadeInAnimation}
 `
 
 export default SearchResult

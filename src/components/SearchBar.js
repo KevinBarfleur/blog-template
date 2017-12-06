@@ -20,7 +20,7 @@ class Search extends Component {
   render () {
     return (
         <div>
-            <SearchBar placeholder='Rechercher' innerRef={x => this.searchInput = x} onChange={() => this.search(this.searchInput.value) }/>
+            <SearchBar placeholder='Rechercher' className='searchInput' innerRef={x => this.searchInput = x} onChange={() => this.search(this.searchInput.value) }/>
         </div>
     )
   }
