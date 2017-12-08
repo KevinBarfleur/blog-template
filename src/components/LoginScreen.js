@@ -7,6 +7,21 @@ import styled, { keyframes } from 'styled-components'
 
 class LoginScreen extends Component {
 
+
+  authenticate = type => {
+    this.props.authenticate(type)
+  }
+
+  renderLogin = () => {
+    return (
+      <AnthenticateContainer>
+        <p>Log in with :</p>
+        <Google className='loginElement' onClick={ () => this.authenticate('google') }>Google</Google>
+        <Facebook className='loginElement' onClick={ () => this.authenticate('facebook') }>Facebook</Facebook>
+      </AnthenticateContainer>
+    )
+  }
+
   render () {
     return (
       <Container className="loginScreen loginElement" ref='container'>
@@ -19,6 +34,7 @@ class LoginScreen extends Component {
             <Input required placeholder='Mot de passe' type='password' className='password loginElement'/>
             <Button type="submit" className='loginElement'>Valider</Button>
         </Form>
+          { this.renderLogin() }
       </Container>
     )
   }
@@ -36,9 +52,19 @@ to {
 }
 `;
 
+const AnthenticateContainer = styled.div`
+  position: absolute;
+  bottom: 10px;
+
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 50px;
+`
+
 const Container = styled.div`
   width: 500px;
-  height: 500px;
+  height: 600px;
 
   z-index: 1;
   position: fixed;
@@ -80,7 +106,7 @@ const Form = styled.form`
   flex-direction: column;
   justify-content: center;
   align-item: center;
-  margin-top: 20%;
+  margin-top: -10%;
 `
 
 const Input = styled.input`
@@ -103,24 +129,55 @@ const Input = styled.input`
 `
 
 const Button = styled.button`
-  margin: 100px auto;
+  margin: 50px auto;
   text-align: center;
+  border-radius: 2px;
   width: 180px;
   height: 40px;
-  background-color: #212121;
-  color: white;
+  background-color: #F5F5F5;
+  color: #212121;
 
   border: 1px solid #F5F5F5;
-  transition: .4s;
+  transition: .3s;
 
   &:hover {
     cursor: pointer;
-    width: 200px;
-    transition: .4s;
+    background-color: #EEEEEE;
+    transition: .3s;
   }
 
   &:focus {
     outline: none;
+  }
+`
+
+const Facebook = styled.button`
+  text-align: center;
+  width: 180px;
+  height: 40px;
+  border: none;
+  border-radius: 2px;
+  background-color: #1976D2;
+  color: white;
+
+  &:hover {
+    cursor: pointer;
+  }
+`
+
+const Google = styled.button`
+  text-align: center;
+  width: 180px;
+  height: 40px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 2px;
+  background-color: #EF5350;
+  color: white;
+
+  &:hover {
+    cursor: pointer;
   }
 `
 

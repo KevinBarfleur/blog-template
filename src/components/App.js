@@ -18,10 +18,6 @@ import SearchBar from './SearchBar'
 import SearchResult from './SearchResult'
 import Loader from './Loader'
 
-// HL.js
-import hl from 'highlight.js'
-
-
 // Styled components
 import styled, { keyframes } from 'styled-components'
 import { fadeIn, fadeInLeft } from 'react-animations'
@@ -33,7 +29,10 @@ class App extends Component {
   
     this.state = {
       login: false,
-      loginScreen: false,
+      owner: null,
+      uid: null,
+      user: null,
+      loginScreen: true,
       createArticlePanelScreen: false,
       search: false,
       articles: { },
@@ -41,7 +40,7 @@ class App extends Component {
         type: 'grid',
         selected: undefined
       },
-      loading: true
+      loading: false
     }
 
     firebase.initializeApp(firebaseConfig)
@@ -58,6 +57,8 @@ class App extends Component {
     this.scrollToArticle = this.scrollToArticle.bind(this)
     this.autoClosePanel = this.autoClosePanel.bind(this)
     this.changeViewFromSearch = this.changeViewFromSearch.bind(this)
+    this.authenticate = this.authenticate.bind(this)
+    this.authHandler = this.authHandler.bind(this)
   }
 
   componentWillMount () {
@@ -322,12 +323,65 @@ class App extends Component {
        })
     }
   }
+
+  authenticate = (type) => {
+    let provider = null
+
+    if (type === 'facebook') {
+      provider = new firebase.auth.FacebookAuthProvider()
+      provider.addScope('user_birthday')
+      provider.setCustomParameters({
+        'display': 'popup'
+      })
+    } else if (type === 'google') {
+      provider = new firebase.auth.GoogleAuthProvider()
+      provider.addScope('https://www.googleapis.com/auth/plus.login')
+      provider.setCustomParameters({
+        'display': 'popup'
+      })
+    }
+
+    firebase.auth().signInWithPopup(provider)
+                      .then(authData => this.authHandler(authData))
+                      .catch(error => console.log(error))
+  }
+
+  authHandler = (authData) => {
+    console.log(authData)
+    const usersRef = firebase.database().ref('users')
+
+    usersRef.on('value', snapshot => {
+      const data = snapshot.val() || {}
+      console.log(data)
+      console.log(data.user)
+
+      if(!data.owner) {
+        usersRef.set({
+          uid: authData.user.uid,
+          owner: data.owner || authData.user.uid,
+          user: data.additionalUserInfo.name
+        })
+      }
+
+      this.setState({
+        uid: authData.user.uid,
+        owner: data.owner || authData.user.uid
+      })
+    })
+  }
+
    
   render () {
     const home = this.state.view.type !== 'grid' ? <Home /> : <Home />
+
     const lastArticlesTitle = this.state.articles ? <ExplorerTitle>Derniers Articles</ExplorerTitle> : null
+
     const loginButton = this.state.login ? null : <LoginButton displayLoginScreen={ this.displayLoginScreen } />
-    const loginScreen = this.state.loginScreen ? <LoginScreen displayLoginScreen={ this.displayLoginScreen } login={ this.login }/> : null
+
+    const loginScreen = this.state.loginScreen ? <LoginScreen displayLoginScreen={ this.displayLoginScreen } 
+                                                              login={ this.login } 
+                                                              authenticate={ this.authenticate } /> : null
+
     const controlPanel = this.state.login ? <ControlPanel disconnect={ this.disconnect } 
                                                           displayCreateArticlePanel={ this.displayCreateArticlePanel }
                                                           quitCreateArticlePanel={ this.quitCreateArticlePanel } /> : null
