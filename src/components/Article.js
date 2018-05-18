@@ -7,7 +7,7 @@ import styled from 'styled-components'
 
 
 class Article extends Component {
-  render () {
+  render() {
     const index = this.props.index
 
     if (this.props.login) {
@@ -17,17 +17,17 @@ class Article extends Component {
     }
 
     let indicator = this.props.details.visible ? <OnlineIndicator><i className="fa fa-circle"></i> En ligne</OnlineIndicator> :
-                                                   <OfflineIndicator><i className="fa fa-circle"></i> Hors-ligne</OfflineIndicator>
+      <OfflineIndicator><i className="fa fa-circle"></i> Hors-ligne</OfflineIndicator>
 
     indicator = this.login ? indicator : null
 
-    if(this.props.details.visible || this.login) {
+    if (this.props.details.visible || this.login) {
       return (
-        <Container className="article" onClick={() => this.props.changeView(index) }>
-          { indicator }
-          <Title>{ this.props.details.article }</Title>
-          <img src={ this.props.details.img } alt='image article' width='60%'/>
-          <Preview>{ this.props.details.preview }</Preview>
+        <Container className="article" onClick={() => this.props.changeView(index)}>
+          {indicator}
+          <Title>{this.props.details.article}</Title>
+          <img src={this.props.details.img} alt='article' width='60%' />
+          <Preview>{this.props.details.preview}</Preview>
         </Container>
       )
     } else {

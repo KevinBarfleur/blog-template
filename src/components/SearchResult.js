@@ -7,31 +7,31 @@ import styled, { keyframes } from 'styled-components'
 import { fadeIn } from 'react-animations'
 
 class SearchResult extends Component {
-  constructor () {
-    super()
+    constructor() {
+        super()
 
-    this.state = {  }
-  } 
+        this.state = {}
+    }
 
-  render () {
-    const index = this.props.index
-    const currentSearch = this.props.currentSearch
-    
+    render() {
+        const index = this.props.index
+        const currentSearch = this.props.currentSearch
 
-    if(this.props.details.keywords) {
-        if(this.props.details.keywords.includes(currentSearch)) {
-            return (
-                <Container className="searchResult" onClick={() => this.props.changeViewFromSearch(index) }>
-                    <h3>{ this.props.details.article }</h3>
-                    <img src={ this.props.details.img } alt='image article' width='60%'/>
-                </Container>
-            )
+
+        if (this.props.details.keywords) {
+            if (this.props.details.keywords.includes(currentSearch)) {
+                return (
+                    <Container className="searchResult" onClick={() => this.props.changeViewFromSearch(index)}>
+                        <h3>{this.props.details.article}</h3>
+                        <img src={this.props.details.img} alt='article' width='60%' />
+                    </Container>
+                )
+            }
         }
-    }    
-    return (
-         null
-    )
-  }
+        return (
+            null
+        )
+    }
 }
 
 // const Fade = ({ in: inProp }) => (
@@ -47,7 +47,7 @@ class SearchResult extends Component {
 //   )
 
 // const duration = 300;
-  
+
 // const defaultStyle = {
 //     transition: `opacity ${duration}ms ease-in-out`,
 //     opacity: 0

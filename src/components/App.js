@@ -24,18 +24,18 @@ import { fadeIn, fadeInLeft } from 'react-animations'
 
 
 class App extends Component {
-  constructor () {
+  constructor() {
     super()
-  
+
     this.state = {
       login: false,
       owner: null,
       uid: null,
       user: null,
-      loginScreen: true,
+      loginScreen: false,
       createArticlePanelScreen: false,
       search: false,
-      articles: { },
+      articles: {},
       view: {
         type: 'grid',
         selected: undefined
@@ -61,15 +61,15 @@ class App extends Component {
     this.authHandler = this.authHandler.bind(this)
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.initializeArticles()
   }
 
-  componentDidUpdate () {
+  componentDidUpdate() {
     this.scrollToArticle()
     this.autoClosePanel()
   }
-  
+
   autoClosePanel = () => {
     if (this.state.loading === false) {
       const app = document.querySelector('.app')
@@ -83,27 +83,41 @@ class App extends Component {
     }
   }
 
-  scrollToArticle = element => {
-    const selectedChildren = this.state.login === true ? 1 : 0
-    if (this.state.loading === false && element) {
-      const articles = document.querySelectorAll('.article')
-      articles.forEach((currentElement, index) => {
-        if (currentElement.children[selectedChildren].textContent === element) {
-          window.scroll({
-            top: currentElement.offsetTop - 100, 
-            left: 0, 
-            behavior: 'smooth' 
+  scrollToArticle = (element, selected) => {
+    if (this.state.view.type === 'grid') {
+      const selectedChildren = this.state.login === true ? 1 : 0
+      if (this.state.loading === false && element) {
+        const articles = document.querySelectorAll('.article')
+        articles.forEach((currentElement, index) => {
+          if (currentElement.children[selectedChildren].textContent === element) {
+            window.scroll({
+              top: currentElement.offsetTop - 100,
+              left: 0,
+              behavior: 'smooth'
+            })
+          }
+        })
+      }
+    } else if (this.state.view.type === 'article') {
+      const articles = this.state.articles
+      Object.keys(articles).forEach(key => {
+        if (articles[key].article === element) {
+          this.setState({
+            view: {
+              type: 'article',
+              selected: selected
+            }
           })
         }
-      })   
-    } 
+      })
+    }
   }
 
   initializeArticles = () => {
     const articleRef = firebase.database().ref('articles')
     articleRef.on('value', snapshot => {
-      this.setState({ 
-        articles: snapshot.val() 
+      this.setState({
+        articles: snapshot.val()
       }, () => {
         setTimeout(() => {
           this.setState({
@@ -154,7 +168,7 @@ class App extends Component {
     const articleRef = firebase.database().ref('articles').child(index).key
     const imageRef = firebase.database().ref('articles').child(index).child('img').key
     const updates = {}
-    
+
     updates['/articles/' + articleRef + '/' + imageRef] = image
     firebase.database().ref().update(updates)
   }
@@ -163,7 +177,7 @@ class App extends Component {
     const articleRef = firebase.database().ref('articles').child(index).key
     const presentationRef = firebase.database().ref('articles').child(index).child('preview').key
     const updates = {}
-    
+
     updates['/articles/' + articleRef + '/' + presentationRef] = presentation
     firebase.database().ref().update(updates)
   }
@@ -210,15 +224,19 @@ class App extends Component {
 
   changeView = index => {
     if (this.state.view.type === 'grid') {
-      this.setState({view: {
-        type: 'article',
-        selected: index
-      }})
+      this.setState({
+        view: {
+          type: 'article',
+          selected: index
+        }
+      })
     } else {
-      this.setState({view: {
-        type: 'grid',
-        selected: undefined
-      }})
+      this.setState({
+        view: {
+          type: 'grid',
+          selected: null
+        }
+      })
     }
   }
 
@@ -244,7 +262,7 @@ class App extends Component {
         formId.focus()
       })
     } else {
-      this.setState({loginScreen: false})
+      this.setState({ loginScreen: false })
     }
   }
 
@@ -271,7 +289,7 @@ class App extends Component {
     const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
     const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
     const d = [days[date.getDay() - 1], date.getDate(), months[date.getMonth()], date.getFullYear()]
-    
+
     return d
   }
 
@@ -282,13 +300,13 @@ class App extends Component {
     // this.setDate(date)
 
     articleRef.push({
-        article: name,
-        img: image,
-        htmlContent: '',
-        preview: preview,
-        sortDate: date.getTime(),
-        visible: false,
-        date: this.setDate(date)
+      article: name,
+      img: image,
+      htmlContent: '',
+      preview: preview,
+      sortDate: date.getTime(),
+      visible: false,
+      date: this.setDate(date)
     })
 
     this.quitCreateArticlePanel()
@@ -310,17 +328,17 @@ class App extends Component {
 
   searchView = (search, value) => {
     if (search) {
-      this.setState({ 
+      this.setState({
         search: false
-       }, () => {
+      }, () => {
         this.setState({ currentSearch: undefined })
       })
     } else {
-      this.setState({ 
+      this.setState({
         search: true
-       }, () => {
-         this.setState({ currentSearch: value })
-       })
+      }, () => {
+        this.setState({ currentSearch: value })
+      })
     }
   }
 
@@ -342,8 +360,8 @@ class App extends Component {
     }
 
     firebase.auth().signInWithPopup(provider)
-                      .then(authData => this.authHandler(authData))
-                      .catch(error => console.log(error))
+      .then(authData => this.authHandler(authData))
+      .catch(error => console.log(error))
   }
 
   authHandler = (authData) => {
@@ -355,7 +373,7 @@ class App extends Component {
       console.log(data)
       console.log(data.user)
 
-      if(!data.owner) {
+      if (!data.owner) {
         usersRef.set({
           uid: authData.user.uid,
           owner: data.owner || authData.user.uid,
@@ -370,91 +388,94 @@ class App extends Component {
     })
   }
 
-   
-  render () {
+
+  render() {
     const home = this.state.view.type !== 'grid' ? <Home /> : <Home />
 
     const lastArticlesTitle = this.state.articles ? <ExplorerTitle>Derniers Articles</ExplorerTitle> : null
 
-    const loginButton = this.state.login ? null : <LoginButton displayLoginScreen={ this.displayLoginScreen } />
+    const loginButton = this.state.login ? null : <LoginButton displayLoginScreen={this.displayLoginScreen} />
 
-    const loginScreen = this.state.loginScreen ? <LoginScreen displayLoginScreen={ this.displayLoginScreen } 
-                                                              login={ this.login } 
-                                                              authenticate={ this.authenticate } /> : null
+    const loginScreen = this.state.loginScreen ? <LoginScreen displayLoginScreen={this.displayLoginScreen}
+      login={this.login}
+      authenticate={this.authenticate} /> : null
 
-    const controlPanel = this.state.login ? <ControlPanel disconnect={ this.disconnect } 
-                                                          displayCreateArticlePanel={ this.displayCreateArticlePanel }
-                                                          quitCreateArticlePanel={ this.quitCreateArticlePanel } /> : null
+    const controlPanel = this.state.login ? <ControlPanel disconnect={this.disconnect}
+      displayCreateArticlePanel={this.displayCreateArticlePanel}
+      quitCreateArticlePanel={this.quitCreateArticlePanel} /> : null
 
-    const createArticlePanelScreen = this.state.createArticlePanelScreen ? <CreateArticlePanel addArticle={ this.addArticle } 
-                                                                                               quitCreateArticlePanel={ this.quitCreateArticlePanel }                                                                              
-                                                                                               selected={ this.state.view.selected } 
-                                                                                               saveArticleHtmlToBase={ this.saveArticleHtmlToBase }
-                                                                                               saveArticleTitle={ this.saveArticleTitle }
-                                                                                               updateTitle={ this.updateTitle }
-                                                                                               updateImage={ this.updateImage }
-                                                                                               updatePresentation={ this.updatePresentation } /> : null
-                                 
+    const createArticlePanelScreen = this.state.createArticlePanelScreen ? <CreateArticlePanel addArticle={this.addArticle}
+      quitCreateArticlePanel={this.quitCreateArticlePanel}
+      selected={this.state.view.selected}
+      saveArticleHtmlToBase={this.saveArticleHtmlToBase}
+      saveArticleTitle={this.saveArticleTitle}
+      updateTitle={this.updateTitle}
+      updateImage={this.updateImage}
+      updatePresentation={this.updatePresentation} /> : null
+
     const explorer = this.state.articles ? Object.keys(this.state.articles).map((key, index) => {
-        if (true) {
-          return (
-            <ExplorerElement key={ key }
-                       login={ this.state.login }
-                       details={ this.state.articles[key] }
-                       scrollToArticle={ this.scrollToArticle } />
-          )
-        }
+      if (true) {
+        return (
+          <ExplorerElement key={key}
+            index={key}
+            login={this.state.login}
+            details={this.state.articles[key]}
+            scrollToArticle={this.scrollToArticle} />
+        )
+      } else {
+        return null
       }
+    }
     ) : null
 
-    const articles = this.state.articles ? Object.keys(this.state.articles).map(key => 
-        <ArticleContainer key={ key }>
-            <Article key={ key } 
-                      index={ key } 
-                      login={ this.state.login }
-                      details={ this.state.articles[key] } 
-                      changeView={ this.changeView } />
-        </ArticleContainer>) : null
+    const articles = this.state.articles ? Object.keys(this.state.articles).map(key =>
+      <ArticleContainer key={key}>
+        <Article key={key}
+          index={key}
+          login={this.state.login}
+          details={this.state.articles[key]}
+          changeView={this.changeView} />
+      </ArticleContainer>) : null
 
-    const article = this.state.articles ? <ArticleView content={ this.state.articles[this.state.view.selected] } 
-                                              selected={ this.state.view.selected } 
-                                              changeView={ this.changeView }
-                                              login={ this.state.login }
-                                              saveArticleHtmlToBase={ this.saveArticleHtmlToBase }
-                                              saveArticleTitle={ this.saveArticleTitle }
-                                              deleteArticle={ this.deleteArticle }
-                                              quitEditor={ this.quitEditor }
-                                              updateTitle={ this.updateTitle }
-                                              updateImage={ this.updateImage }
-                                              updatePresentation={ this.updatePresentation }
-                                              uploadArticle={ this.uploadArticle }
-                                              updateKeywords={ this.updateKeywords } /> : null
+    const article = this.state.articles ? <ArticleView content={this.state.articles[this.state.view.selected]}
+      selected={this.state.view.selected}
+      changeView={this.changeView}
+      login={this.state.login}
+      saveArticleHtmlToBase={this.saveArticleHtmlToBase}
+      saveArticleTitle={this.saveArticleTitle}
+      deleteArticle={this.deleteArticle}
+      quitEditor={this.quitEditor}
+      updateTitle={this.updateTitle}
+      updateImage={this.updateImage}
+      updatePresentation={this.updatePresentation}
+      uploadArticle={this.uploadArticle}
+      updateKeywords={this.updateKeywords} /> : null
 
-    const searchedArticles = this.state.articles ? Object.keys(this.state.articles).map(key => 
-            <SearchResult key={ key } 
-                    index={ key }
-                    details={ this.state.articles[key] }
-                    currentSearch={ this.state.currentSearch } 
-                    changeViewFromSearch= { this.changeViewFromSearch } />) : null
+    const searchedArticles = this.state.articles ? Object.keys(this.state.articles).map(key =>
+      <SearchResult key={key}
+        index={key}
+        details={this.state.articles[key]}
+        currentSearch={this.state.currentSearch}
+        changeViewFromSearch={this.changeViewFromSearch} />) : null
 
-    let view = this.state.view.type === 'grid' ? <ContainerGrid className="articlesGrid">{ articles }</ContainerGrid> : article
-    view = this.state.search === true ?  <SearchContainer>{ searchedArticles }</SearchContainer> : view
+    let view = this.state.view.type === 'grid' ? <ContainerGrid className="articlesGrid">{articles}</ContainerGrid> : article
+    view = this.state.search === true ? <SearchContainer>{searchedArticles}</SearchContainer> : view
 
     if (this.state.loading === false) {
       return (
         <div>
           <ContainerApp className="app">
-            <SearchBar searchView= { this.searchView } />
-            { controlPanel }
-            { loginButton }
-            { loginScreen }
-            { createArticlePanelScreen }
+            <SearchBar searchView={this.searchView} />
+            {controlPanel}
+            {loginButton}
+            {loginScreen}
+            {createArticlePanelScreen}
             <ExplorerPanel>
-            { explorer }
-            { lastArticlesTitle }
+              {explorer}
+              {lastArticlesTitle}
             </ExplorerPanel>
-            { home }         
-            { view }
+            {home}
+            {view}
           </ContainerApp>
         </div>
       )

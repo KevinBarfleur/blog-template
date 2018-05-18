@@ -9,12 +9,13 @@ import React, { Component } from 'react'
 // Styled components
 import styled from 'styled-components'
 
-
 class Home extends Component {
-  render () {
+  render() {
     return (
       <Container className="Home">
-        <Title><Span>D</Span>roit<Span>.</Span></Title>
+        <Title>
+          <Span>B</Span>log<Span>.</Span>
+        </Title>
       </Container>
     )
   }
@@ -32,12 +33,10 @@ const Title = styled.h1`
   padding: 10%;
 `
 
-const Span= styled.span`
+const Span = styled.span`
   color: #212121;
   font-size: 1em;
-  text-shadow: -10px -10px #FFF9C4,
-              10px -10px #F48FB1,
-              -10px 10px #90CAF9;
+  text-shadow: -10px -10px #fff9c4, 10px -10px #f48fb1, -10px 10px #90caf9;
 `
 
 export default Home

@@ -19,7 +19,7 @@ class ExplorerElement extends Component {
 
     if (this.props.details.visible || this.login) {
       return (
-        <Element className="explorerElement" onClick={ () => this.props.scrollToArticle(this.props.details.article) }>
+        <Element className="explorerElement" onClick={ () => this.props.scrollToArticle(this.props.details.article, this.props.index) }>
           { indicator } { this.props.details.article }
         </Element>
       )
