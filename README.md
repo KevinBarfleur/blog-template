@@ -1,8 +1,4 @@
-Username : sudo <br>
-Password : sudo <br>
-
-
-
+https://kevinbarfleur.github.io/blog-template/
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
 
